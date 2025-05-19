@@ -1,0 +1,137 @@
+spring:
+  application:
+    name: space-repetition-backend
+  
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+    show-sql: false
+
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1 hour
+      cache-null-values: false
+  
+  # GraphQL Configuration
+  graphql:
+    servlet:
+      mapping: /graphql
+      enabled: true
+      cors-enabled: true
+      exception-handlers-enabled: true
+    spqr:
+      gui:
+        enabled: true
+  
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/auth/realms/srvls
+          jwk-set-uri: http://localhost:8080/auth/realms/srvls/protocol/openid-connect/certs
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6400}
+      password: ${REDIS_PASSWORD:}
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
+
+# AWS S3 Configuration
+aws:
+  s3:
+    region: us-east-1
+    bucket-name: srvls-media
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+
+# Elasticsearch Configuration
+elasticsearch:
+  host: localhost
+  port: 9200
+  username: elastic
+  password: changeme
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:}
+  expiration: 86400000  # 24 hours in milliseconds
+  header: Authorization
+  prefix: Bearer
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.xai.srvls: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.cache: INFO
+    org.hibernate: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/srvls.log
+    max-size: 10MB
+    max-history: 10
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  packages-to-scan: com.xai.srvls.controller
+
+# Custom Application Properties
+srvls:
+  # Cors Configuration
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+  
+  # Media Storage
+  media:
+    base-url: https://srvls-media.s3.amazonaws.com/
+    allowed-extensions: jpg,jpeg,png,gif,mp3,wav
+    max-file-size: 10485760  # 10MB in bytes
+  
+  # Spaced Repetition
+  spaced-repetition:
+    default-easiness-factor: 2.5
+    min-easiness-factor: 1.3
+    max-easiness-factor: 5.0
+    default-interval: 1
