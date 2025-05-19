@@ -77,11 +77,11 @@ public class FlashcardService {
     @Transactional
     public Flashcard create(Flashcard flashcard, UUID deckId, UUID userId) {
         Deck deck = deckRepository.findById(deckId)
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found with id: " + deckId));
+                .orElseThrow(() -> new com.xai.srvls.exception.DeckNotFoundException(deckId.toString()));
         
         // Check if the user is the owner of the deck
         if (!deck.getOwner().getId().equals(userId)) {
-            throw new SecurityException("User not authorized to add flashcards to this deck");
+            throw new com.xai.srvls.exception.UnauthorizedAccessException("this deck");
         }
         
         flashcard.setDeck(deck);
@@ -102,7 +102,7 @@ public class FlashcardService {
                 .map(flashcard -> {
                     // Check if the user is the owner of the deck
                     if (!flashcard.getDeck().getOwner().getId().equals(userId)) {
-                        throw new SecurityException("User not authorized to update this flashcard");
+                        throw new com.xai.srvls.exception.UnauthorizedAccessException("this flashcard");
                     }
                     
                     flashcard.setFrontContent(updatedFlashcard.getFrontContent());
@@ -116,7 +116,7 @@ public class FlashcardService {
                     
                     return flashcardRepository.save(flashcard);
                 })
-                .orElseThrow(() -> new IllegalArgumentException("Flashcard not found with id: " + id));
+                .orElseThrow(() -> new com.xai.srvls.exception.FlashcardNotFoundException(id.toString()));
     }
 
     /**
@@ -131,7 +131,7 @@ public class FlashcardService {
                 .ifPresent(flashcard -> {
                     // Check if the user is the owner of the deck
                     if (!flashcard.getDeck().getOwner().getId().equals(userId)) {
-                        throw new SecurityException("User not authorized to delete this flashcard");
+                        throw new com.xai.srvls.exception.UnauthorizedAccessException("this flashcard");
                     }
                     
                     flashcardRepository.delete(flashcard);
