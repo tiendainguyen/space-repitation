@@ -81,14 +81,14 @@ public class ReviewService {
     @Transactional
     public Review createReview(Review review, UUID flashcardId, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new com.xai.srvls.exception.UserNotFoundException(userId.toString()));
         
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new IllegalArgumentException("Flashcard not found with id: " + flashcardId));
+                .orElseThrow(() -> new com.xai.srvls.exception.FlashcardNotFoundException(flashcardId.toString()));
         
         // Check if the user can access the flashcard
         if (!canUserAccessFlashcard(flashcard, userId)) {
-            throw new SecurityException("User not authorized to review this flashcard");
+            throw new com.xai.srvls.exception.UnauthorizedAccessException("this flashcard");
         }
         
         review.setUser(user);

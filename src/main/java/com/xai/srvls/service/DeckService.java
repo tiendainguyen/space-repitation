@@ -116,7 +116,7 @@ public class DeckService {
     @Transactional
     public Deck create(Deck deck, UUID userId) {
         User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new com.xai.srvls.exception.UserNotFoundException(userId.toString()));
         
         deck.setOwner(owner);
         return deckRepository.save(deck);
@@ -136,7 +136,7 @@ public class DeckService {
                 .map(deck -> {
                     // Check if the user is the owner
                     if (!deck.getOwner().getId().equals(userId)) {
-                        throw new SecurityException("User not authorized to update this deck");
+                        throw new com.xai.srvls.exception.UnauthorizedAccessException("this deck");
                     }
                     
                     deck.setName(updatedDeck.getName());
@@ -148,7 +148,7 @@ public class DeckService {
                     
                     return deckRepository.save(deck);
                 })
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found with id: " + id));
+                .orElseThrow(() -> new com.xai.srvls.exception.DeckNotFoundException(id.toString()));
     }
     
     /**
@@ -163,7 +163,7 @@ public class DeckService {
                 .ifPresent(deck -> {
                     // Check if the user is the owner
                     if (!deck.getOwner().getId().equals(userId)) {
-                        throw new SecurityException("User not authorized to delete this deck");
+                        throw new com.xai.srvls.exception.UnauthorizedAccessException("this deck");
                     }
                     
                     deckRepository.delete(deck);

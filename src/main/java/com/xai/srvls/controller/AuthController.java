@@ -122,7 +122,7 @@ public class AuthController {
 
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Role not found."));
+                .orElseThrow(() -> new com.xai.srvls.exception.RoleNotFoundException(ERole.ROLE_USER.name()));
         roles.add(userRole);
         user.setRoles(roles);
 
